@@ -1,8 +1,10 @@
 # First Python API 🐍
-My first Python API
+My first Python API mock with pytest
 
+## Deps
 ```
-pip install -r requirements.txt
+python 3.14.0
+pytest 8.4.2
 ```
 
 ## Utils
