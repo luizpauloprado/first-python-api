@@ -17,6 +17,7 @@ def test_get():
 def test_post():
     my_api = api()
     my_api["POST"](1)
+    
     result = my_api["POST"](2)
     expected = {
         "code": 201,
