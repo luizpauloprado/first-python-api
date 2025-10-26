@@ -21,7 +21,7 @@ class ProductIn:
         if not self.name or not self.name.strip():
             errors.append("Name cannot be empty")
 
-        if self.price < 0:
+        if not self.price or self.price < 0:
             errors.append("Price cannot be less than 0")
 
         if not self.category or not self.category.strip():
