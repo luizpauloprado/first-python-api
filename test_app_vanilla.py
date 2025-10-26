@@ -1,9 +1,8 @@
-from app import api
+from app import api, ProductIn
 
 
-def test(test_name, function_result, expected):
+def assertTrue(test_name, function_result, expected):
     result: bool = function_result == expected
-
 
     if result == True:
         print(f"{test_name}: ✅")
@@ -13,32 +12,66 @@ def test(test_name, function_result, expected):
         print(f"expected: {expected}", end="\n")
 
 
-api = api()
-api["POST"](1)
+def test_get():
+    print("GET ALL:")
+    client = api()
+    result = client["GET"]()
 
-test(
-    test_name="Should GET",
-    function_result=api["GET"](),
-    expected={
-        "code": 200,
-        "data": [1],
-    },
-)
+    assertTrue(
+        test_name="GET ALL - Status code is 200",
+        function_result=result["code"],
+        expected=200,
+    )
+    assertTrue(
+        test_name="GET ALL - Data has items",
+        function_result=len(result["data"]),
+        expected=1,
+    )
 
-test(
-    test_name="Should POST",
-    function_result=api["POST"](2),
-    expected={
-        "code": 201,
-        "data": [1, 2],
-    },
-)
 
-test(
-    test_name="Should POST and get an error",
-    function_result=api["POST"](2),
-    expected={
-        "code": 500,
-        "error": "2 already exists",
-    },
-)
+test_get()
+
+
+def test_post():
+    print("POST:")
+    client = api()
+    product = ProductIn(
+        name="Procut 2",
+        price=100,
+        category="Category 2",
+    )
+    result = client["POST"](product)
+
+    assertTrue(
+        test_name="POST - Status code is 201",
+        function_result=result["code"],
+        expected=201,
+    )
+    assertTrue(
+        test_name="POST - product created",
+        function_result=result["data"].id,
+        expected=2,
+    )
+
+
+test_post()
+
+
+def test_post_validation_error():
+    print("POST VALIDATION ERROR:")
+    client = api()
+    product = ProductIn(
+        name="Procut 2",
+        price=-1,
+        category="Category 2",
+    )
+    result = client["POST"](product)
+
+    assertTrue(
+        test_name="POST VALIDATION ERROR - Status code is 422",
+        function_result=result["code"],
+        expected=422,
+    )
+
+
+test_post_validation_error()

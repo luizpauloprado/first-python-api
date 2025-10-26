@@ -1,38 +1,40 @@
-from app import api
-import pytest
+import unittest
+from app import API, ProductIn
 
 
-def test_get():
-    my_api = api()
-    my_api["POST"](1)
+class TestApp(unittest.TestCase):
+    def test_get(self):
+        client = API()
+        result = client.get()
 
-    result = my_api["GET"]()
-    expected = {
-        "code": 200,
-        "data": [1],
-    }
-    assert result == expected
+        self.assertEqual(result["code"], 200)
+        self.assertEqual(len(result["data"]), 1)
+
+    def test_post(self):
+        client = API()
+        product = ProductIn(
+            name="Procut 2",
+            price=100,
+            category="Category 2",
+        )
+        result = client.post(product)
+
+        self.assertEqual(result["code"], 201)
+        self.assertIsNotNone(result["data"])
+        self.assertIsNotNone(result["data"]["id"])
+
+    def test_post_validation_error(self):
+        client = API()
+        product = ProductIn(
+            name="Procut 2",
+            price=-1,
+            category="Category 2",
+        )
+        result = client.post(product)
+
+        self.assertEqual(result["code"], 422)
+        self.assertIn("Price cannot be less than 0", result["error"])
 
 
-def test_post():
-    my_api = api()
-    my_api["POST"](1)
-    
-    result = my_api["POST"](2)
-    expected = {
-        "code": 201,
-        "data": [1, 2],
-    }
-    assert result == expected
-
-
-def test_post_error():
-    my_api = api()
-    my_api["POST"](1)
-
-    result = my_api["POST"](1)
-    expected = {
-        "code": 500,
-        "error": "1 already exists",
-    }
-    assert result == expected
+if __name__ == "__main__":
+    unittest.main()
